@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<p>请输入您的用户名：<input value="" id="inp" /></p>
+<button id="sub" >加入聊天室</button>
+
+<script>
+    var sub = document.getElementById("sub");
+    var inp = document.getElementById("inp");
+
+    sub.onclick = function (ev) {
+        var s = inp.value;
+        if(s=="" || s==undefined){
+            alert("请输入用户名！")
+            return false;
+        }
+        window.open("/chat.html?username="+s);
+    }
+
+</script>
+</body>
+</html>
