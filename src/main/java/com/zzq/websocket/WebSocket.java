@@ -10,6 +10,8 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +35,11 @@ public class WebSocket {
      * 以用户的姓名为key，WebSocket为对象保存起来
      */
     private static Map<String, WebSocket> clients = new ConcurrentHashMap<String, WebSocket>();
+
+    public static Map<String, WebSocket> getClients() {
+        return clients;
+    }
+
     /**
      * 会话
      */
@@ -41,6 +48,8 @@ public class WebSocket {
      * 用户名称
      */
     private String username;
+
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
     private String objectToJsonString(Object obj){
         try{
@@ -64,6 +73,7 @@ public class WebSocket {
      */
     @OnOpen
     public void onOpen(@PathParam("username") String username, Session session) {
+        String date = simpleDateFormat.format(new Date());
         onlineNumber++;
         log.info("现在来连接的客户id：" + session.getId() + "用户名：" + username);
         this.username = username;
@@ -75,6 +85,7 @@ public class WebSocket {
             Map<String, Object> map1 = new HashMap<>();
             map1.put("messageType", 1);
             map1.put("username", username);
+            map1.put("t" , date);
             sendMessageAll(objectToJsonString(map1), username);
 
             //把自己的信息加入到map当中去
@@ -85,6 +96,7 @@ public class WebSocket {
             //移除掉自己
             Set<String> set = clients.keySet();
             map2.put("onlineUsers", set);
+            map2.put("t", date);
             sendMessageTo(objectToJsonString(map2), username);
         } catch (IOException e) {
             log.info(username + "上线的时候通知所有人发生了错误");
@@ -113,6 +125,7 @@ public class WebSocket {
             map1.put("messageType", 2);
             map1.put("onlineUsers", clients.keySet());
             map1.put("username", username);
+            map1.put("t" , simpleDateFormat.format(new Date()));
             sendMessageAll(objectToJsonString(map1), username);
         } catch (IOException e) {
             log.info(username + "下线的时候通知所有人发生了错误");
@@ -140,6 +153,7 @@ public class WebSocket {
             map1.put("messageType", 4);
             map1.put("textMessage", textMessage);
             map1.put("fromusername", fromusername);
+            map1.put("t" , simpleDateFormat.format(new Date()));
             if (tousername.equals("All")) {
                 map1.put("tousername", "所有人");
                 sendMessageAll(objectToJsonString(map1), fromusername);

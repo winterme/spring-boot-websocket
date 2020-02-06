@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class WebSocketController {
@@ -23,5 +24,12 @@ public class WebSocketController {
             return "error";
         }
     }
+
+    @RequestMapping("/verfUSerName")
+    @ResponseBody
+    public Object verfUSerName(String username){
+        return WebSocket.getClients().get(username)==null;
+    }
+
 
 }
